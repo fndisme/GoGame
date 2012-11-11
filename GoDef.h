@@ -17,16 +17,27 @@
  */
 #ifndef FND_GODEF_H
 #define FND_GODEF_H
+#include <cassert>
 #include <utility>
 #include <vector>
-enum GoColor { None, Black, White } ;
+#include <set>
+#include <memory>
+enum class GoColor { None, Black, White } ;
 typedef std::pair<int,int> GoPosition ;
 typedef std::pair<GoPosition, GoColor> StoneInfomation ;
 
 inline bool
 operator < (const GoPosition& lhs, const GoPosition& rhs) {
   return lhs.first < rhs.first ?
-    true : lhs.right < rhs.right ;
+    true : lhs.second < rhs.second ;
 }
+
+class GoGroup ;
+
+class GoAction ;
+typedef std::shared_ptr<GoAction> GoActionPointer ;
+typedef std::weak_ptr<GoAction> GoActionWeakPointer ;
+
+
 
 #endif

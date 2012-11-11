@@ -21,10 +21,6 @@
 #include <memory>
 #include <boost/variant.hpp>
 #include "GoDef.h"
-class GoAction ;
-typedef std::shared_ptr<GoAction> GoActionPointer ;
-typedef std::weak_ptr<GoAction> GoActionWeakPointer ;
-
 typedef boost::variant<
     GoActionPointer,
     std::vector<GoActionPointer>

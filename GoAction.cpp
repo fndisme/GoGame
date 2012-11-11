@@ -23,7 +23,7 @@ GoAction::GoAction(GoActionPointer par, const GoPosition& pos, GoColor c) :
   m_color(c) {}
 
 GoActionPointer GoAction::makeRoot() {
-  return GoActionPointer(new GoAction(nullptr, GoPosition(0,0), None)) ;
+  return GoActionPointer(new GoAction(nullptr, GoPosition(0,0), GoColor::None)) ;
 }
 
 GoActionPointer GoAction::makeChild(const GoPosition& pos, GoColor c) {

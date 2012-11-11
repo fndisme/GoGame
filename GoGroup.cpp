@@ -16,16 +16,12 @@
  * =====================================================================================
  */
 #include "GoGroup.h"
-#include "GoQi.h"
 
 void GoGroup::addMember(GoPosition const& pos,
-    const std::vector<QiType>& q) {
+    const std::vector<GoPosition>& q) {
   assert(!hasMember(pos)) ;
-
   m_member.insert(pos) ;
-
-
-
+  m_qi.insert(q.begin(), q.end()) ;
 }
 
 

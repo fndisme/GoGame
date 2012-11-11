@@ -17,10 +17,14 @@
  */
 #include <cassert>
 #include <iostream>
+#include "GoDef.h"
 #include "GoAction.h"
+#include "GoStone.h"
 
 int main(int argc, char** argv) {
   auto root = GoAction::makeRoot() ;
   assert(root->isRoot()) ;
+
+  GoStone stone(GoPosition(1,1), GoColor::White) ;
   return 0 ;
 }

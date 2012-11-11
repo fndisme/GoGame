@@ -33,8 +33,8 @@ class GoStone {
     enum class NeighbourState {
       NotExistPos,
       None,
-      SameColor,
-      Opponent,
+      BlackColor,
+      WhiteColor,
     } ;
 
     typedef std::tuple<NeighbourState, int> Neighbour ;
@@ -60,13 +60,15 @@ class GoStone {
       m_neighbour.at(neighbourPos) = std::make_tuple(s, 0) ;
     }
 
-    void setNeighbourSameColor(int neighbourPos, int groupId) {
-      m_neighbour.at(neighbourPos) = std::make_tuple(NeighbourState::SameColor, groupId) ;
+    void setNeighbourColor(int neighbourPos, int groupId, GoColor c) {
+      if(c == GoColor::Black)
+        m_neighbour.at(neighbourPos) = std::make_tuple(NeighbourState::BlackColor, groupId) ;
+      else if(c == GoColor::White)
+        m_neighbour.at(neighbourPos) = std::make_tuple(NeighbourState::WhiteColor, groupId) ;
+      else
+        m_neighbour.at(neighbourPos) = std::make_tuple(NeighbourState::None, 0) ;
     }
 
-    void setNeighbourOppnent(int neighbourPos, int groupId) {
-      m_neighbour.at(neighbourPos) = std::make_tuple(NeighbourState::Opponent, groupId) ;
-    }
 
     bool hasNeighbour(int direction) const {
       return direction >= 0 && direction < NeighbourMax &&
@@ -81,17 +83,20 @@ class GoStone {
       return GoPosition(m_position.first +1 , m_position.second) ;
     }
 
-    std::vector<int> opponentGroups() const {
+    std::vector<int> colorGroup(GoColor c) const {
       std::vector<int> groups ;
+      NeighbourState b(NeighbourState::BlackColor) ;
+      if(c == GoColor::White) b = NeighbourState::WhiteColor ;
+      if(c == GoColor::None) b = NeighbourState::None ;
       for(const auto& g : m_neighbour) {
-        if(std::get<0>(g) == NeighbourState::Opponent) {
+        if(std::get<0>(g) == b) {
           if(std::find(groups.begin(), groups.end(), std::get<1>(g)) == groups.end())
             groups.push_back(std::get<1>(g)) ;
         }
       }
-
       return groups ;
     }
+
 
   private:
     GoPosition m_position ;

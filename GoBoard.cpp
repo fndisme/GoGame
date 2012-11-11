@@ -66,13 +66,15 @@ bool GoBoard::canPlaceStone(const GoPosition& pos, GoColor c) const {
   if(stone(pos).color() == c) return false ;
 
   if(c == GoColor::None) return true ; // remove stone
+  if(stone(pos).color() != GoColor::None) return false ; // place position must has no
 
-  if(isCurrentBoardColor(*this, c)) return false ;
+  if(!isCurrentBoardColor(*this, c)) return false ;
 
   if(isForbiddenPosition(*this, pos)) return false ;
   if(isRemoveOpponentGroup(pos, c)) return true ;
+
+  if(isCombineGroupAndAlive(pos, c)) return true ;
   if(isRemoveSelfGroup(pos, c)) return false ;
-  if(isCombineGroup(pos, c)) return true ;
 
   // last result
   /*  if(isMakeNewGroup(pos, c)) */
@@ -81,7 +83,12 @@ bool GoBoard::canPlaceStone(const GoPosition& pos, GoColor c) const {
 
 bool GoBoard::isRemoveOpponentGroup(const GoPosition& pos, GoColor c) const {
   assert(!hasStonePosition(pos)) ;
-  auto opponentsGroup = m_stones[pos.first * m_maxY + pos.second].opponentGroups() ;
+  GoColor opponentColor ;
+  if(c == GoColor::Black) opponentColor = GoColor::White ;
+  if(c == GoColor::White) opponentColor = GoColor::Black ;
+  assert(opponentColor == GoColor::White ||
+      opponentColor == GoColor::Black) ;
+  auto opponentsGroup = m_stones[pos.first * m_maxY + pos.second].colorGroup(opponentColor) ;
   if(opponentsGroup.empty()) return false ;
 
   for(auto g : opponentsGroup) {
@@ -95,7 +102,7 @@ bool GoBoard::isRemoveSelfGroup(const GoPosition& pos, GoColor c) const {
   return false ;
 }
 
-bool GoBoard::isCombineGroup(const GoPosition& pos, GoColor c) const {
+bool GoBoard::isCombineGroupAndAlive(const GoPosition& pos, GoColor c) const {
   assert(false) ;
   return false ;
 }
