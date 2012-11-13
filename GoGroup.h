@@ -18,8 +18,6 @@
 #ifndef FND_GOGROUP_H
 #define FND_GOGROUP_H
 #include "GoDef.h"
-class GoQi ;
-typedef std::shared_ptr<GoQi> QiType ;
 class GoGroup {
   typedef std::set<GoPosition> PositionGroup;
   PositionGroup m_member ;

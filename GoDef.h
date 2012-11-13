@@ -22,7 +22,7 @@
 #include <vector>
 #include <set>
 #include <memory>
-enum class GoColor { None, Black, White } ;
+enum class GoColor {None, Black, White} ;
 typedef std::pair<int,int> GoPosition ;
 typedef std::pair<GoPosition, GoColor> StoneInfomation ;
 
@@ -33,10 +33,19 @@ operator < (const GoPosition& lhs, const GoPosition& rhs) {
 }
 
 class GoGroup ;
+class GoBoard ;
 
 class GoAction ;
-typedef std::shared_ptr<GoAction> GoActionPointer ;
-typedef std::weak_ptr<GoAction> GoActionWeakPointer ;
+//typedef std::shared_ptr<GoAction> GoActionPointer ;
+//typedef std::weak_ptr<GoAction> GoActionWeakPointer ;
+
+inline bool hasDirectConnection(GoPosition const& lhs, GoPosition const& rhs) {
+  if(lhs.first == rhs.first && ((lhs.second - rhs.second == 1) || 
+        (lhs.second - rhs.second == -1))) return true ;
+  if(lhs.second == rhs.second && ((lhs.first - rhs.first == 1) || 
+        (lhs.first - rhs.first == -1))) return true ;
+  return false ;
+}
 
 
 

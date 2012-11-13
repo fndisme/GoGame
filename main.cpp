@@ -20,11 +20,18 @@
 #include "GoDef.h"
 #include "GoAction.h"
 #include "GoStone.h"
+#include "GoBoard.h"
 
 int main(int argc, char** argv) {
-  auto root = GoAction::makeRoot() ;
-  assert(root->isRoot()) ;
 
   GoStone stone(GoPosition(1,1), GoColor::White) ;
+
+  GoBoard board(9,9) ;
+  assert(board.canPlaceStone(GoPosition(0,0), GoColor::Black)) ;
+  board.placeStone(GoPosition(0,0), GoColor::Black) ;
+  board.placeStone(GoPosition(0,1), GoColor::White) ;
+  //board.placeStone(GoPosition(0,2), GoColor::Black) ;
+  //board.placeStone(GoPosition(1,0), GoColor::White) ;
+  board.debugPrintCurrentBoard() ;
   return 0 ;
 }

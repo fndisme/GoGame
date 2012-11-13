@@ -17,3 +17,7 @@
 
 # bin file
 main
+
+
+# build dir
+build

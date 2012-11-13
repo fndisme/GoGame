@@ -51,6 +51,7 @@ class GoStone {
     void color(GoColor c) { m_color = c ;}
     void bindGroup(int group) ;
     void unbindGroup() ;
+    void debugInformaiton() const ;
     bool hasGroup() const { return m_group_ref != -1;}
     GoStone(GoStone const&) = default ;
     GoStone& operator = (const GoStone&) = default ;
@@ -59,6 +60,8 @@ class GoStone {
           s == NeighbourState::None) ;
       m_neighbour.at(neighbourPos) = std::make_tuple(s, 0) ;
     }
+
+    int groupId() const { return m_group_ref ;}
 
     void setNeighbourColor(int neighbourPos, int groupId, GoColor c) {
       if(c == GoColor::Black)
@@ -97,7 +100,6 @@ class GoStone {
       return groups ;
     }
 
-
   private:
     GoPosition m_position ;
     GoColor m_color ;
@@ -105,5 +107,46 @@ class GoStone {
     std::array<Neighbour, NeighbourMax> m_neighbour ;
     
 } ;
+
+inline 
+std::vector<GoPosition> stoneNeighbourPosition(GoStone const& stone) {
+  std::vector<GoPosition> positions ;
+  if(stone.hasNeighbour(GoStone::POS_UP))
+    positions.push_back(stone.neighbourPosition(GoStone::POS_UP)) ;
+  if(stone.hasNeighbour(GoStone::POS_DOWN))
+    positions.push_back(stone.neighbourPosition(GoStone::POS_DOWN)) ;
+  if(stone.hasNeighbour(GoStone::POS_LEFT))
+    positions.push_back(stone.neighbourPosition(GoStone::POS_LEFT)) ;
+  if(stone.hasNeighbour(GoStone::POS_RIGHT))
+    positions.push_back(stone.neighbourPosition(GoStone::POS_RIGHT)) ;
+  return positions ;
+}
+
+inline bool isQi(GoStone const& stone) {
+  return stone.color() == GoColor::None ;
+}
+
+inline bool isWhiteStone(const GoStone& stone) {
+  return stone.color() == GoColor::White ;
+}
+
+inline bool isBlackStone(const GoStone& stone) {
+  return stone.color() == GoColor::Black ;
+}
+
+inline int stoneDirection(const GoStone& slhs,
+    const GoStone& srhs) {
+  const auto& lhs = slhs.position() ;
+  const auto& rhs = srhs.position() ;
+  if((lhs.first - rhs.first) == 1) return GoStone::POS_LEFT ;
+  if((lhs.first - rhs.first) == -1) return GoStone::POS_RIGHT ;
+  if((lhs.second - rhs.second) == 1) return GoStone::POS_DOWN ;
+  if((lhs.second - rhs.second) == -1) return GoStone::POS_UP ;
+  assert(false) ;
+  return GoStone::POS_LEFT ;
+}
+
+
+
 
 #endif

@@ -16,6 +16,7 @@
  * =====================================================================================
  */
 //#include "GoGroup.h"
+#include <iostream>
 #include "GoStone.h"
 
 void GoStone::unbindGroup() {
@@ -23,5 +24,28 @@ void GoStone::unbindGroup() {
   m_group_ref =  -1;
 }
 
+void GoStone::debugInformaiton() const {
+  std::string cdes ;
+  if(m_color == GoColor::None) cdes = "None" ;
+  if(m_color == GoColor::White) cdes = "White" ;
+  if(m_color == GoColor::Black) cdes = "Black" ;
+  std::cout << "P:(" << m_position.first << ","
+    << m_position.second << ")C:" << cdes << " ";
+  for(auto n : m_neighbour) {
+    std::string ns ;
+    
+    if(std::get<0>(n) == NeighbourState::NotExistPos) ns = "NotExist" ;
+    if(std::get<0>(n) == NeighbourState::None) ns = "None" ;
+    if(std::get<0>(n) == NeighbourState::BlackColor) ns = "BlackColor" ;
+    if(std::get<0>(n) == NeighbourState::WhiteColor) ns = "WhiteColor" ;
+    std::cout << "N:" << ns << ":" << std::get<1>(n) << " " ; 
+  }
+  for(auto s : stoneNeighbourPosition(*this)) {
+    std::cout << "NP:(" << s.first << "," << s.second << ")" ;
+  }
+
+  std::cout << std::endl ;
+
+}
 
 

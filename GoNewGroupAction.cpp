@@ -22,7 +22,7 @@ GoAction::pointer GoNewGroupAction::doClone() const {
   return pointer(new GoNewGroupAction(*this)) ;
 }
 
-GoAction::pointer GoNewGroupAction::doAction(GoBoard* board) {
+void GoNewGroupAction::doAction(GoBoard* board) {
   board->addNewGroup(m_group_id, m_group) ;
 }
 
@@ -34,11 +34,11 @@ GoAction::pointer GoRemoveSingleStoneGroupAction::doClone() const {
   return pointer(new GoRemoveSingleStoneGroupAction(*this)) ;
 }
 
-GoAction::pointer GoRemoveSingleStoneGroupAction::doAction(GoBoard* board) {
+void GoRemoveSingleStoneGroupAction::doAction(GoBoard* board) {
   board->removeSingleGroup(m_group_id) ;
 }
 
-GoAction::pointer GoNewGroupAction::doRevertAction() const {
+GoAction::pointer GoRemoveSingleStoneGroupAction::doRevertAction() const {
   return pointer(new GoNewGroupAction(m_group_id, m_group)) ;
 }
 

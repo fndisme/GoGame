@@ -19,31 +19,21 @@
 #define FND_GOACTION_H
 #include <vector>
 #include <memory>
-#include <boost/variant.hpp>
+//#include <boost/variant.hpp>
 #include "GoDef.h"
-typedef boost::variant<
-    GoActionPointer,
-    std::vector<GoActionPointer>
-  > GoPointerTree ;
 
-class GoAction : public std::enable_shared_from_this<GoAction>{
-  private:
-    GoPosition m_pos ;
-    GoColor m_color ;
-    GoActionWeakPointer m_parent ;
-    GoPointerTree m_children ;
-
-    GoAction(GoActionPointer parent, const GoPosition& pos, GoColor) ;
-    void appendChild(GoActionPointer child);
-    void buildRoom() ;
+class GoAction {
   public:
-    bool isRoot() const { return !m_parent.lock().get();}
-    size_t childrenSize() const ;
-    const GoPosition& position() const { return m_pos ;}
-    GoColor color() const { return m_color ;}
-    GoActionPointer makeChild(const GoPosition& pos, GoColor) ;
-    static 
-      GoActionPointer makeRoot() ;
+    typedef std::unique_ptr<GoAction> pointer ;
+    pointer clone() const { return doClone() ;}
+    virtual ~GoAction() {}
+    pointer revertAction() const { return doRevertAction() ;}
+    void action(GoBoard* board) { doAction(board) ;}
 
+  private:
+    virtual pointer doClone()const = 0 ;
+    virtual pointer doRevertAction() const= 0 ;
+    virtual void doAction(GoBoard*) = 0 ;
+    
 } ;
 #endif

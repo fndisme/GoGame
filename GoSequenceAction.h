@@ -31,8 +31,8 @@ class GoSequenceAction : public GoAction {
     }
     pointer doRevertAction() const { 
       Sequence seqs ;
-      for(m_sequence.rbegin(), m_sequence.rend(), [&seqs](Sequence::const_reference v) {
-          seq.push_back(v->revertAction()) ;
+      std::for_each(m_sequence.rbegin(), m_sequence.rend(), [&seqs](Sequence::const_reference v) {
+          seqs.push_back(v->revertAction()) ;
           }) ;
       
       return pointer(new GoSequenceAction(std::move(seqs))) ;
@@ -43,6 +43,8 @@ class GoSequenceAction : public GoAction {
       for(const auto& v : m_sequence) seqs.push_back(v->clone()) ;
       return pointer(new GoSequenceAction(std::move(seqs))) ;
     }
+
+    Sequence m_sequence ;
 } ;
 
 #endif

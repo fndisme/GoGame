@@ -39,16 +39,41 @@ class GoBoard {
 
     GoColor currentColor() const { return m_currentColor ;}
 
-    bool isRemoveOpponentGroup(GoPosition const& pos, GoColor c) const ;
-    bool isRemoveSelfGroup(GoPosition const& pos, GoColor c) const ;
-    bool isCombineGroupAndAlive(GoPosition const& pos, GoColor c) const ;
+    typedef std::set<int> GroupType ;
+    GroupType removedOpponentGroup(GoPosition const& pos, GoColor c) const ;
+    void removeStone(GoPosition const& pos) ;
+    void placeStone(GoPosition const& pos) ; // not set color because must be current color
+    //bool isRemoveSelfGroup(GoPosition const& pos, GoColor c) const ;
+    GroupType combinedGroupAndAlive(GoPosition const& pos, GoColor c) const ;
     bool hasStonePosition(GoPosition const& pos) const {
       return pos.first >= 0 && pos.second >= 0 &&
         pos.first < m_maxX && pos.second < m_maxY ;
     }
 
+    //GoBoard(const GoBoard& board) ;
+
+    void abandonCurrentRight() ;
+    void passToRivalColor(GoColor c) {
+      if(c == GoColor::None) m_currentColor = GoColor::None ;
+      if(c == GoColor::White) m_currentColor = GoColor::Black ;
+      if(c == GoColor::Black) m_currentColor = GoColor::White ;
+      removeForbbinPosition() ;
+    }
+
+    void placeStone(GoPosition const& pos, GoColor c) ;
+
+    const GoStone& stone(const GoPosition& pos) const
+    { return m_stones.at(pos.first * m_maxY + pos.second) ;}
+
+    void addNewGroup(int groupid, GoGroup const& group) ; 
+    void removeSingleGroup(int groupid) ; 
+
+    void debugPrintCurrentBoard() const ;
+
+
   private:
     //GoActionPointer m_current_action ;
+    typedef std::unique_ptr<GoAction> ActionPointer ;
     int m_maxX ;
     int m_maxY ;
 
@@ -56,17 +81,21 @@ class GoBoard {
     // FIXME
     std::map<int, GoGroup> m_group ;
     std::vector<GoStone> m_stones; 
-    std::vector<GoActionPointer> m_actions ;
+    std::vector<ActionPointer> m_actions ;
 
     GoPosition m_forbiddenPosition ;
     GoColor m_currentColor ;
+    int m_nextGroupId = 0;
 
     GoStone& stone(const GoPosition& pos)
     { return m_stones.at(pos.first * m_maxY + pos.second) ;}
     
+    void removeForbbinPosition() ;
 
-    const GoStone& stone(const GoPosition& pos) const
-    { return m_stones.at(pos.first * m_maxY + pos.second) ;}
+    bool hasGroup(int groupid) const { return m_group.count(groupid) ;}
+    void setStoneAsSolid(const GoPosition& pos, GoColor c) ;
+    void updateStoneStateAsQi(const GoPosition& pos, const GoPosition& ori, int groupId) ;
+    void updateStoneStateAsSolid(const GoPosition& pos, int groupId) ;
 } ;
 
 inline bool isCurrentBoardColor(GoBoard const& b, GoColor c) {
@@ -79,5 +108,7 @@ inline bool isForbiddenPosition(GoBoard const& b, const GoPosition& pos) {
 } 
 
 bool hasForbiddenPosition(GoBoard const& b) ;
+
+std::vector<GoPosition> stoneQiPositionInBoard(const GoPosition& pos, const GoBoard&) ;
 
 #endif
