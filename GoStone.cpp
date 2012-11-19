@@ -19,9 +19,15 @@
 #include <iostream>
 #include "GoStone.h"
 
+void GoStone::bindGroup(int g) {
+  assert(!hasGroup()) ;
+  m_group_ref = g ;
+}
+
 void GoStone::unbindGroup() {
   assert(hasGroup()) ;
   m_group_ref =  -1;
+  m_color = GoColor::None ;
 }
 
 void GoStone::debugInformaiton() const {

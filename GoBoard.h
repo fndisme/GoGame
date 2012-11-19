@@ -60,6 +60,12 @@ class GoBoard {
       removeForbbinPosition() ;
     }
 
+    void combineGroups(const Groups& groups) ; 
+    void addGroupMember(const GoPosition& pos,
+        const std::vector<GoPosition>& qis,
+        int group) ;
+        
+
     void placeStone(GoPosition const& pos, GoColor c) ;
 
     const GoStone& stone(const GoPosition& pos) const
@@ -67,6 +73,8 @@ class GoBoard {
 
     void addNewGroup(int groupid, GoGroup const& group) ; 
     void removeSingleGroup(int groupid) ; 
+    void removeGroup(int groupid) ;
+    void setStoneAsNone(const GoPosition& pos) ;
 
     void debugPrintCurrentBoard() const ;
 
@@ -93,9 +101,9 @@ class GoBoard {
     void removeForbbinPosition() ;
 
     bool hasGroup(int groupid) const { return m_group.count(groupid) ;}
-    void setStoneAsSolid(const GoPosition& pos, GoColor c) ;
-    void updateStoneStateAsQi(const GoPosition& pos, const GoPosition& ori, int groupId) ;
-    void updateStoneStateAsSolid(const GoPosition& pos, int groupId) ;
+    void setStoneAsSolid(const GoPosition& pos, int c) ;
+    //void updateStoneStateAsQi(const GoPosition& pos, const GoPosition& ori, int groupId) ;
+    //void updateStoneStateAsSolid(const GoPosition& pos, int groupId) ;
 } ;
 
 inline bool isCurrentBoardColor(GoBoard const& b, GoColor c) {

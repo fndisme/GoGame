@@ -20,6 +20,7 @@
 #include <tuple>
 #include <array>
 #include <algorithm>
+#include <iostream>
 #include "GoDef.h"
 class GoStone {
   public:
@@ -59,6 +60,15 @@ class GoStone {
       assert(s == NeighbourState::NotExistPos||
           s == NeighbourState::None) ;
       m_neighbour.at(neighbourPos) = std::make_tuple(s, 0) ;
+    }
+
+    bool allNeighbourIsRival(GoColor c) const {
+      assert(c == GoColor::White || c == GoColor::Black) ;
+      NeighbourState nc = NeighbourState::BlackColor ;
+      if(c == GoColor::White) nc = NeighbourState::WhiteColor ;
+      return std::all_of(m_neighbour.begin(), m_neighbour.end(), [nc](const Neighbour& v) ->bool {
+          return std::get<0>(v) == nc || std::get<0>(v) == NeighbourState::NotExistPos ;
+          }) ;
     }
 
     int groupId() const { return m_group_ref ;}
@@ -108,6 +118,28 @@ class GoStone {
     
 } ;
 
+inline int oppsiteDirection(int direction) {
+  if(direction == GoStone::POS_UP) return GoStone::POS_DOWN ;
+  else if(direction == GoStone::POS_DOWN) return GoStone::POS_UP ;
+  else if(direction == GoStone::POS_LEFT) return GoStone::POS_RIGHT ;
+  else if(direction == GoStone::POS_RIGHT) return GoStone::POS_LEFT ;
+  assert(false) ;
+  return -1 ;
+}
+
+inline 
+std::vector<int> rivalColorGroup(const GoStone& lhs) {
+  assert(lhs.color() == GoColor::White || lhs.color() == GoColor::Black) ;
+  return lhs.colorGroup(opponentColor(lhs.color())) ;
+}
+
+inline
+bool isRival(const GoStone& lhs, const GoStone& rhs) {
+  if(lhs.color() == GoColor::White) return rhs.color() == GoColor::Black ;
+  if(lhs.color() == GoColor::Black) return rhs.color() == GoColor::White ;
+  return false ;
+}
+
 inline 
 std::vector<GoPosition> stoneNeighbourPosition(GoStone const& stone) {
   std::vector<GoPosition> positions ;
@@ -138,14 +170,26 @@ inline int stoneDirection(const GoStone& slhs,
     const GoStone& srhs) {
   const auto& lhs = slhs.position() ;
   const auto& rhs = srhs.position() ;
-  if((lhs.first - rhs.first) == 1) return GoStone::POS_LEFT ;
-  if((lhs.first - rhs.first) == -1) return GoStone::POS_RIGHT ;
-  if((lhs.second - rhs.second) == 1) return GoStone::POS_DOWN ;
-  if((lhs.second - rhs.second) == -1) return GoStone::POS_UP ;
+  if((lhs.first - rhs.first) == 1) return GoStone::POS_LEFT;
+  if((lhs.first - rhs.first) == -1) return GoStone::POS_RIGHT;
+  if((lhs.second - rhs.second) == 1) return GoStone::POS_DOWN;
+  if((lhs.second - rhs.second) == -1) return GoStone::POS_UP;
   assert(false) ;
   return GoStone::POS_LEFT ;
 }
 
+inline void updateStoneRelation(GoStone& lhs, GoStone& rhs) {
+  int direction = stoneDirection(lhs, rhs) ;
+  lhs.setNeighbourColor(direction, rhs.groupId(), rhs.color()) ;
+  rhs.setNeighbourColor(oppsiteDirection(direction), lhs.groupId(), lhs.color()) ;
+}
+
+inline void bindColorGroup(GoStone& s, GoColor c, int groupId) {
+  if(s.color() == c) 
+    s.unbindGroup() ;
+  s.color(c) ;
+  s.bindGroup(groupId) ;
+}
 
 
 

@@ -23,6 +23,12 @@
 #include <set>
 #include <memory>
 enum class GoColor {None, Black, White} ;
+inline
+GoColor opponentColor(GoColor c) {
+  if(c == GoColor::None) return GoColor::None ;
+  if(c == GoColor::Black) return GoColor::White ;
+  return GoColor::Black ;
+}
 typedef std::pair<int,int> GoPosition ;
 typedef std::pair<GoPosition, GoColor> StoneInfomation ;
 

@@ -16,6 +16,7 @@
  * =====================================================================================
  */
 #include "GoAddGroupMember.h"
+#include "GoBoard.h"
 
 GoAction::pointer GoAddGroupMember::doRevertAction() const {
   return pointer(new GoRemoveGroupMemberAction(m_position, m_maybeAddedQi, m_group)) ;
@@ -26,7 +27,7 @@ GoAction::pointer GoRemoveGroupMemberAction::doRevertAction() const {
 }
 
 void GoAddGroupMember::doAction(GoBoard* board) {
-assert(false) ;
+  board->addGroupMember(m_position, m_maybeAddedQi, m_group) ;
 }
 
 void GoRemoveGroupMemberAction::doAction(GoBoard* board) {

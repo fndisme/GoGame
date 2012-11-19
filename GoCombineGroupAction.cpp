@@ -23,7 +23,7 @@ GoAction::pointer GoCombineGroupAction::doRevertAction() const {
 }
 
 void GoCombineGroupAction::doAction(GoBoard* board) {
-  assert(false) ;
+  board->combineGroups(m_groups) ;
 }
 
 void GoBreakGroupAction::doAction(GoBoard* board) {

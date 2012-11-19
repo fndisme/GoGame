@@ -17,6 +17,7 @@
  */
 #ifndef FND_GOGROUP_H
 #define FND_GOGROUP_H
+#include <vector>
 #include "GoDef.h"
 class GoGroup {
   typedef std::set<GoPosition> PositionGroup;
@@ -27,8 +28,14 @@ class GoGroup {
 
   public:
     explicit GoGroup(GoColor c) : m_color(c) {}
+    GoGroup(GoGroup const& g) : 
+      m_member(g.m_member),
+      m_qi(g.m_qi),
+      m_color(g.m_color) {}
+
     GoColor color() const { return m_color ;}
     void addMember(GoPosition const& pos, const std::vector<GoPosition>& qi) ;
+    void addMember(const PositionGroup& mems) { m_member.insert(mems.begin(), mems.end()) ;}
     const QiGroup& qi() const { return m_qi;}
     const PositionGroup& member() const { return m_member ;}
     bool hasMember(GoPosition const& pos) const { return m_member.count(pos) ;}
@@ -37,7 +44,17 @@ class GoGroup {
     bool isDeadIfRemoveQi(GoPosition const& pos) const {
       return m_qi.size() == 1 && m_qi.count(pos) == 1 ;
     }
+    void removeQi(const GoPosition& q) { m_qi.erase(q) ;}
+    void addQi(const GoPosition& q) { m_qi.insert(q) ;}
+    template<typename T>
+      void addQi(const T& qiGroup) {
+        m_qi.insert(qiGroup.begin(), qiGroup.end()) ;
+      }
+    void debugInformaiton() const ;
 } ;
+
+
+typedef std::vector<std::pair<int, GoGroup>> Groups ;
 
 //bool is_can_combine(const GoGroup& lhs, const GoGroup& rhs) ;
 //bool is_can_combine(const GoGroup& lhs, const GoGroup& rhs,  QiType qiPos) ;

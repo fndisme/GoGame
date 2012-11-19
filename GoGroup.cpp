@@ -15,6 +15,7 @@
  *
  * =====================================================================================
  */
+#include <iostream>
 #include "GoGroup.h"
 
 void GoGroup::addMember(GoPosition const& pos,
@@ -22,6 +23,18 @@ void GoGroup::addMember(GoPosition const& pos,
   assert(!hasMember(pos)) ;
   m_member.insert(pos) ;
   m_qi.insert(q.begin(), q.end()) ;
+}
+
+void GoGroup::debugInformaiton() const {
+  std::cout << "M:" ;
+  for(const auto& m : m_member) 
+    std::cout << "N:(" << m.first << ":" << m.second << ")" ;
+  std::cout << std::endl ;
+
+  for(const auto& q : m_qi)
+    std::cout << "Q:(" << q.first << ":" << q.second << ")" ;
+  std::cout << std::endl ;
+
 }
 
 

@@ -30,8 +30,11 @@ int main(int argc, char** argv) {
   assert(board.canPlaceStone(GoPosition(0,0), GoColor::Black)) ;
   board.placeStone(GoPosition(0,0), GoColor::Black) ;
   board.placeStone(GoPosition(0,1), GoColor::White) ;
-  //board.placeStone(GoPosition(0,2), GoColor::Black) ;
-  //board.placeStone(GoPosition(1,0), GoColor::White) ;
+  board.placeStone(GoPosition(0,2), GoColor::Black) ;
+  board.placeStone(GoPosition(1,0), GoColor::White) ;
+  board.debugPrintCurrentBoard() ;
+  board.placeStone(GoPosition(3,3), GoColor::Black) ;
+  board.placeStone(GoPosition(1,1), GoColor::White) ;
   board.debugPrintCurrentBoard() ;
   return 0 ;
 }

@@ -22,7 +22,6 @@
 
 class GoCombineGroupAction : public GoAction {
   public:
-  typedef std::vector<std::pair<int, GoGroup>> Groups ;
   explicit GoCombineGroupAction(const Groups& groups) :
     m_groups(groups) {}
   private:
@@ -34,7 +33,6 @@ class GoCombineGroupAction : public GoAction {
 
 class GoBreakGroupAction : public GoAction {
   public:
-    typedef GoCombineGroupAction::Groups Groups ;
     explicit GoBreakGroupAction(const Groups& groups) :
       m_groups(groups) {}
   private:
