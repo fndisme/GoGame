@@ -38,6 +38,7 @@ operator < (const GoPosition& lhs, const GoPosition& rhs) {
     true : lhs.second < rhs.second ;
 }
 
+typedef std::set<GoPosition> ForbiddenGroup ;
 class GoGroup ;
 class GoBoard ;
 

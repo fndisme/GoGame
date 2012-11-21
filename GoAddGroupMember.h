@@ -35,6 +35,7 @@ class GoAddGroupMember : public GoAction {
     pointer doClone() const { return pointer(new GoAddGroupMember(m_position, m_maybeAddedQi, m_group)) ;}
     pointer doRevertAction() const ;
     void doAction(GoBoard*) ;
+    std::string doName() const { return "GoAddGroupMember" ;}
 } ;
 
 
@@ -55,6 +56,7 @@ class GoRemoveGroupMemberAction : public GoAction {
     pointer doClone() const { return pointer(new GoRemoveGroupMemberAction(m_position, m_maybeRemovedQi, m_group)) ;}
     pointer doRevertAction() const ;
     void doAction(GoBoard*) ;
+    std::string doName() const { return "GoRemoveGroupMemberAction" ;}
 
 } ;
 #endif

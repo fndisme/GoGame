@@ -30,6 +30,7 @@ class GoRemoveGroupAction : public GoAction {
     pointer doClone() const { return pointer(new GoRemoveGroupAction(m_removedGroup));}
     pointer doRevertAction() const ;
     void doAction(GoBoard*) ;
+    std::string doName() const { return "GoRemoveGroupAction" ;}
 } ;
 
 class GoRecreateGroupAction : public GoAction {
@@ -45,5 +46,6 @@ class GoRecreateGroupAction : public GoAction {
     pointer doClone() const { return pointer(new GoRecreateGroupAction(m_recreateGroup)) ;}
     pointer doRevertAction() const ;
     void doAction(GoBoard*) ;
+    std::string doName() const { return "GoRecreateGroupAction" ;}
 } ;
 #endif

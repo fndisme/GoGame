@@ -18,13 +18,14 @@
 #ifndef FND_GOGROUP_H
 #define FND_GOGROUP_H
 #include <vector>
+#include <string>
 #include "GoDef.h"
 class GoGroup {
   typedef std::set<GoPosition> PositionGroup;
   PositionGroup m_member ;
   typedef std::set<GoPosition> QiGroup ;
   QiGroup m_qi ;
-  const GoColor m_color ;
+  GoColor m_color ;
 
   public:
     explicit GoGroup(GoColor c) : m_color(c) {}
@@ -32,6 +33,12 @@ class GoGroup {
       m_member(g.m_member),
       m_qi(g.m_qi),
       m_color(g.m_color) {}
+    GoGroup& operator = (const GoGroup& g) {
+      m_member = g.m_member ;
+      m_qi = g.m_qi ;
+      m_color = g.m_color ;
+      return *this ;
+    }
 
     GoColor color() const { return m_color ;}
     void addMember(GoPosition const& pos, const std::vector<GoPosition>& qi) ;

@@ -18,6 +18,7 @@
 #ifndef FND_GOSEQUENCEACTION_H
 #define FND_GOSEQUENCEACTION_H
 #include <algorithm>
+#include <iostream>
 #include "GoAction.h"
 
 class GoSequenceAction : public GoAction {
@@ -27,7 +28,12 @@ class GoSequenceAction : public GoAction {
 
   private:
     void doAction(GoBoard* b) {
-      for(auto& v : m_sequence) v->action(b) ;
+      std::cout << "action size is " << m_sequence.size() << std::endl ;
+      for(auto& v : m_sequence) {
+        std::cout << v->name() << std::endl ;
+        v->action(b) ;
+
+      }
     }
     pointer doRevertAction() const { 
       Sequence seqs ;
@@ -45,6 +51,8 @@ class GoSequenceAction : public GoAction {
     }
 
     Sequence m_sequence ;
+
+    std::string doName() const { return "GoSequenceAction" ;}
 } ;
 
 #endif

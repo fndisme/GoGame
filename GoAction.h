@@ -19,6 +19,7 @@
 #define FND_GOACTION_H
 #include <vector>
 #include <memory>
+#include <string>
 //#include <boost/variant.hpp>
 #include "GoDef.h"
 
@@ -29,11 +30,13 @@ class GoAction {
     virtual ~GoAction() {}
     pointer revertAction() const { return doRevertAction() ;}
     void action(GoBoard* board) { doAction(board) ;}
+    std::string name() const { return doName() ;} // for debug
 
   private:
     virtual pointer doClone()const = 0 ;
     virtual pointer doRevertAction() const= 0 ;
     virtual void doAction(GoBoard*) = 0 ;
+    virtual std::string doName() const = 0 ;
     
 } ;
 #endif

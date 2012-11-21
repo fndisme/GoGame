@@ -32,9 +32,20 @@ int main(int argc, char** argv) {
   board.placeStone(GoPosition(0,1), GoColor::White) ;
   board.placeStone(GoPosition(0,2), GoColor::Black) ;
   board.placeStone(GoPosition(1,0), GoColor::White) ;
-  board.debugPrintCurrentBoard() ;
   board.placeStone(GoPosition(3,3), GoColor::Black) ;
   board.placeStone(GoPosition(1,1), GoColor::White) ;
+  board.placeStone(GoPosition(4,4), GoColor::Black) ;
+  board.placeStone(GoPosition(2,3), GoColor::White) ;
+  board.placeStone(GoPosition(3,5), GoColor::Black) ;
+  board.placeStone(GoPosition(2,5), GoColor::White) ;
+  board.placeStone(GoPosition(2,4), GoColor::Black) ;
+  board.placeStone(GoPosition(1,4), GoColor::White) ;
+  board.placeStone(GoPosition(5,5), GoColor::Black) ;
+  board.placeStone(GoPosition(3,4), GoColor::White) ;
+  assert(!board.canPlaceStone(GoPosition(2,4), GoColor::Black)) ;
+
+  assert(board.canTakeBack()) ;
+  board.takeBackOneHand() ;
   board.debugPrintCurrentBoard() ;
   return 0 ;
 }

@@ -29,6 +29,7 @@ class GoCombineGroupAction : public GoAction {
   pointer doClone() const { return pointer(new GoCombineGroupAction(m_groups)) ;}
   pointer doRevertAction() const ;
   void doAction(GoBoard*) ;
+  std::string doName() const { return "GoCombineGroupAction" ;}
 } ;
 
 class GoBreakGroupAction : public GoAction {
@@ -40,6 +41,7 @@ class GoBreakGroupAction : public GoAction {
     pointer doClone() const { return pointer(new GoBreakGroupAction(m_groups)) ;}
     pointer doRevertAction() const { return pointer(new GoCombineGroupAction(m_groups)) ;}
     void doAction(GoBoard*) ;
+    std::string doName() const { return "GoBreakGroupAction" ;}
 
 } ;
 #endif

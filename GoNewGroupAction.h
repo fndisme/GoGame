@@ -30,6 +30,7 @@ class GoNewGroupAction : public GoAction {
     void doAction(GoBoard* board) ;
     pointer doClone() const ;
     pointer doRevertAction() const ;
+    std::string doName() const { return "GoNewGroupAction" ;}
 
     int m_group_id ;
     GoGroup m_group ;
@@ -48,6 +49,7 @@ class GoRemoveSingleStoneGroupAction : public GoAction {
     void doAction(GoBoard* board) ;
     pointer doClone() const ;
     pointer doRevertAction() const ;
+    std::string doName() const { return "GoRemoveSingleStoneGroupAction" ;}
 
     int m_group_id ;
     GoGroup m_group ;

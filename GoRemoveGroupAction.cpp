@@ -19,7 +19,7 @@
 #include "GoBoard.h"
 
 void GoRemoveGroupAction::doAction(GoBoard* b) {
-  for(auto g : m_removedGroup)
+  for(const auto& g : m_removedGroup)
     b->removeGroup(g.first) ;
 }
 
@@ -28,7 +28,8 @@ GoAction::pointer GoRemoveGroupAction::doRevertAction() const{
 }
 
 void GoRecreateGroupAction::doAction(GoBoard* b) {
-  assert(false) ;
+  for(const auto& g : m_recreateGroup) 
+    b->recreateGroup(g.first, g.second) ;
 }
 
 GoAction::pointer GoRecreateGroupAction::doRevertAction() const {

@@ -34,8 +34,8 @@ class GoBoard {
     //void toAction(int step, int forkPos = 0) ;
     //void addFork(int step) ;
     //GoBoardSnap snap(int step) const ;
-    pointer clone() ;
-    GoPosition const& forbiddenPosition() const { return m_forbiddenPosition ;}
+    pointer clone(int step) ;
+    const ForbiddenGroup& forbiddenPositions() const { return m_forbiddenPositions;}
 
     GoColor currentColor() const { return m_currentColor ;}
 
@@ -50,15 +50,19 @@ class GoBoard {
         pos.first < m_maxX && pos.second < m_maxY ;
     }
 
+    void resetForbidenPositions(const ForbiddenGroup& group) {
+      assert(!group.empty() || m_forbiddenPositions.empty()) ;
+      m_forbiddenPositions = group ;
+    }
+
     //GoBoard(const GoBoard& board) ;
 
     void abandonCurrentRight() ;
-    void passToRivalColor(GoColor c) {
-      if(c == GoColor::None) m_currentColor = GoColor::None ;
-      if(c == GoColor::White) m_currentColor = GoColor::Black ;
-      if(c == GoColor::Black) m_currentColor = GoColor::White ;
-      removeForbbinPosition() ;
+    void passHandToColor(GoColor c) {
+      m_currentColor = c ;
     }
+
+    void setNewGroupId(int groupId) { m_nextGroupId = groupId ;}
 
     void combineGroups(const Groups& groups) ; 
     void addGroupMember(const GoPosition& pos,
@@ -77,7 +81,9 @@ class GoBoard {
     void setStoneAsNone(const GoPosition& pos) ;
 
     void debugPrintCurrentBoard() const ;
-
+    bool canTakeBack() const { return !m_actions.empty() ;}
+    void takeBackOneHand() ;
+    void recreateGroup(int groupid, const GoGroup& g) ;
 
   private:
     //GoActionPointer m_current_action ;
@@ -87,11 +93,12 @@ class GoBoard {
 
     // this must recaculate
     // FIXME
-    std::map<int, GoGroup> m_group ;
+    typedef std::map<int, GoGroup> ColorGroupType ;
+    ColorGroupType m_group ;
     std::vector<GoStone> m_stones; 
     std::vector<ActionPointer> m_actions ;
 
-    GoPosition m_forbiddenPosition ;
+    ForbiddenGroup m_forbiddenPositions ;
     GoColor m_currentColor ;
     int m_nextGroupId = 0;
 
@@ -102,6 +109,7 @@ class GoBoard {
 
     bool hasGroup(int groupid) const { return m_group.count(groupid) ;}
     void setStoneAsSolid(const GoPosition& pos, int c) ;
+    bool hasColorGroupDeadIfPlaceStone(const GoPosition& pos, GoColor c) const ;
     //void updateStoneStateAsQi(const GoPosition& pos, const GoPosition& ori, int groupId) ;
     //void updateStoneStateAsSolid(const GoPosition& pos, int groupId) ;
 } ;
@@ -112,7 +120,7 @@ inline bool isCurrentBoardColor(GoBoard const& b, GoColor c) {
 
 
 inline bool isForbiddenPosition(GoBoard const& b, const GoPosition& pos) {
-  return pos == b.forbiddenPosition();
+  return b.forbiddenPositions().count(pos);
 } 
 
 bool hasForbiddenPosition(GoBoard const& b) ;

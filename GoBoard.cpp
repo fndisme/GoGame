@@ -15,13 +15,16 @@
  *
  * =====================================================================================
  */
+#include <algorithm>
 #include "GoBoard.h"
-#include "GoAbandonRightAction.h"
 #include "GoSequenceAction.h"
 #include "GoNewGroupAction.h"
+#include "GoSetNewGroupIdAction.h"
+#include "GoPassCurrentColorAction.h"
 #include "GoAddGroupMember.h"
 #include "GoRemoveGroupAction.h"
 #include "GoCombineGroupAction.h"
+#include "GoSetForbidenAction.h"
 
 #include <iostream>
 
@@ -31,8 +34,8 @@ namespace {
 
 
 void GoBoard::debugPrintCurrentBoard() const {
-  for(int x = 0 ; x < m_maxX ; ++x) {
-    for(int y = 0 ; y < m_maxY ; ++y) {
+  for(int y = 0 ; y < m_maxY ; ++y) {
+    for(int x = 0 ; x < m_maxX ; ++x) {
         auto& s = stone(GoPosition(x,y)) ;
         if(s.color() == GoColor::None) std::cout << "." ;
         else if(s.color() == GoColor::Black) std::cout << "b" ;
@@ -51,27 +54,32 @@ void GoBoard::debugPrintCurrentBoard() const {
   }
 }
 bool hasForbiddenPosition(GoBoard const& b) {
-  return b.forbiddenPosition() != InvalidPostion ;
+  return b.forbiddenPositions().empty() ;
 }
 
 void GoBoard::removeForbbinPosition() {
-  m_forbiddenPosition = InvalidPostion ;
+  m_forbiddenPositions.clear() ;
 }
 
-GoBoard::pointer GoBoard::clone() {
+GoBoard::pointer GoBoard::clone(int step) {
+  assert(step < m_actions.size()) ;
   pointer board(new GoBoard(m_maxX, m_maxY)) ;
-  board->m_currentColor = m_currentColor ;
-  board->m_group = m_group ;
-  board->m_stones = m_stones ;
-  board->m_forbiddenPosition = m_forbiddenPosition ;
-  board->m_nextGroupId = m_nextGroupId ;
-  for(const auto& a : m_actions) board->m_actions.push_back(a->clone()) ;
+  for(int i = 0 ;i < step ; ++i) {
+    board->m_actions.push_back(m_actions[i]->clone()) ;
+  }
+  for(auto& action : board->m_actions) action->action(board.get()) ;
   return board ;
+}
+
+void GoBoard::takeBackOneHand() {
+  assert(canTakeBack()) ;
+  auto action = m_actions.back()->revertAction() ;
+  m_actions.pop_back() ;
+  action->action(this) ;
 }
 
 GoBoard::GoBoard(int mx, int my) : m_maxX(mx),
   m_maxY(my),
-  m_forbiddenPosition(InvalidPostion),
   m_currentColor(GoColor::Black){
     assert(mx > 0) ;
     assert(my > 0) ;
@@ -101,12 +109,17 @@ void GoBoard::removeStone(const GoPosition& pos) {
 }
 
 void GoBoard::abandonCurrentRight() {
-  GoAction::pointer act(new GoAbandonRightAction(m_currentColor)) ;
+  GoAction::pointer act(new GoPassCurrentColorAction(opponentColor(m_currentColor))) ;
   act->action(this) ;
   m_actions.push_back(std::move(act)) ;
 }
 
-
+bool GoBoard::hasColorGroupDeadIfPlaceStone(const GoPosition& pos, GoColor c) const {
+  return std::any_of(m_group.begin(), m_group.end(),
+        [&pos, c](ColorGroupType::const_reference v) -> bool {
+       return v.second.color() == c && v.second.isDeadIfRemoveQi(pos) ;
+      }) ;
+}
 
 bool GoBoard::canPlaceStone(const GoPosition& pos, GoColor c) const {
   if(pos.first < 0 ||
@@ -119,11 +132,14 @@ bool GoBoard::canPlaceStone(const GoPosition& pos, GoColor c) const {
 
   if(stone(pos).color() != GoColor::None) return false ; // place position must has no color
 
+  if(isForbiddenPosition(*this, pos)) return false ;
+
+  if(hasColorGroupDeadIfPlaceStone(pos, opponentColor(c))) return true ;
+
   if(stone(pos).allNeighbourIsRival(opponentColor(c))) return false ;
 
   if(!isCurrentBoardColor(*this, c)) return false ;
 
-  if(isForbiddenPosition(*this, pos)) return false ;
   return true ;
 //  if(isRemoveOpponentGroup(pos, c) || isCombineGroupAndAlive(pos, c)) return true ;
 //  //if(isRemoveSelfGroup(pos, c)) return false ;
@@ -193,12 +209,24 @@ void GoBoard::placeStone(GoPosition const& pos, GoColor c) {
 
   std::vector<GoAction::pointer> seqs ;
   auto removed(removedOpponentGroup(pos, c)) ;
+
+  ForbiddenGroup newGroup ; 
   if(!removed.empty()) {
     GoRemoveGroupAction::RemoveGroupType gs ;
-    for(auto groupid : removed)
+    for(auto groupid : removed) {
       gs.push_back(std::make_pair(groupid, m_group.at(groupid))) ;
+      if(m_group.at(groupid).member().size() == 1) {
+        newGroup.insert(*(m_group.at(groupid).member().begin())) ;
+      }
+    }
     seqs.push_back(GoAction::pointer(new GoRemoveGroupAction(gs))) ;
   } 
+
+  // set fordin
+  if(!newGroup.empty() || !m_forbiddenPositions.empty()) {
+    std::cout << "add forbiden........." ;
+    seqs.push_back(GoAction::pointer(new GoSetForbidenAction(m_forbiddenPositions, newGroup))) ;
+  }
 
 
   auto combined(combinedGroupAndAlive(pos, c)) ;
@@ -220,8 +248,11 @@ void GoBoard::placeStone(GoPosition const& pos, GoColor c) {
     GoGroup newGroup(c) ;
     newGroup.addMember(pos, stoneQiPositionInBoard(pos, *this)) ;
     seqs.push_back(GoAction::pointer(new GoNewGroupAction(start, newGroup))) ;
+    seqs.push_back(GoAction::pointer(new GoPassCurrentColorAction(opponentColor(m_currentColor)))) ;
+    seqs.push_back(GoAction::pointer(new GoSetNewGroupIdAction(m_nextGroupId + 1, m_nextGroupId))) ;
   } else {
     seqs.push_back(GoAction::pointer(new GoAddGroupMember(pos, stoneQiPositionInBoard(pos, *this), start))) ;
+    seqs.push_back(GoAction::pointer(new GoPassCurrentColorAction(opponentColor(m_currentColor)))) ;
   }
 
   GoAction::pointer seqAction(new GoSequenceAction(std::move(seqs))) ;
@@ -230,7 +261,7 @@ void GoBoard::placeStone(GoPosition const& pos, GoColor c) {
 }
 
 void GoBoard::combineGroups(const Groups& groups) {
-  assert(groups.size() >= 2) ;
+  assert(groups.size() >= 1) ;
   int newGroupId = groups[0].first ;
   auto& g = m_group.at(newGroupId) ;
   for(size_t i = 1 ; i < groups.size() ; ++i) {
@@ -249,7 +280,7 @@ void GoBoard::addGroupMember(const GoPosition& pos,
     int groupid) {
   m_group.at(groupid).addMember(pos, qis) ;
   setStoneAsSolid(pos, groupid) ;
-  passToRivalColor(m_group.at(groupid).color()) ;
+  //passToRivalColor(m_group.at(groupid).color()) ;
 }
 
 void GoBoard::addNewGroup(int groupid, GoGroup const& group) {
@@ -265,8 +296,7 @@ void GoBoard::addNewGroup(int groupid, GoGroup const& group) {
 //  }
 //  for(auto s : group.member()) updateStoneStateAsSolid(s, groupid) ;
 //
-  passToRivalColor(group.color()) ;
-  m_nextGroupId ++ ;
+  //passToRivalColor(group.color()) ;
 }
 
 /* 
@@ -296,11 +326,8 @@ void GoBoard::setStoneAsSolid(const GoPosition& pos, int groupid) {
   auto& g = m_group.at(groupid) ;
   assert(g.color() != GoColor::None) ;
   auto& s = stone(pos) ;
-  std::cout << int(g.color()) << std::endl ;
   bindColorGroup(s, g.color(), groupid) ;
-  std::cout << int(s.color()) << std::endl ;
   assert(s.color() != GoColor::None) ;
-  debugPrintCurrentBoard() ;
 
   for(auto neighbourPos : stoneNeighbourPosition(s)) {
     auto& neighbour = stone(neighbourPos) ;
@@ -318,6 +345,18 @@ void GoBoard::removeGroup(int groupId) {
   for(const auto& pos : group.member()) 
     setStoneAsNone(pos) ;
   m_group.erase(groupId) ;
+}
+
+void GoBoard::recreateGroup(int groupId, const GoGroup& g) {
+  if(m_group.count(groupId)) {
+    removeGroup(groupId) ;
+  }
+
+  m_group.insert(std::make_pair(groupId,g)) ;
+  for(const auto& pos : g.member()) {
+    setStoneAsSolid(pos, groupId) ;
+  }
+  
 }
 
 void GoBoard::setStoneAsNone(const GoPosition& pos) {
@@ -338,6 +377,12 @@ void GoBoard::removeSingleGroup(int groupid) {
   assert(hasGroup(groupid)) ;
   auto& group = m_group.at(groupid) ;
   assert(group.member().size() == 1) ;
+
+  for(const auto& pos : group.member()) {
+    setStoneAsNone(pos) ;
+  }
+
+  m_group.erase(groupid) ;
 
   //auto qi = m_group.
 
