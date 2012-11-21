@@ -1,12 +1,12 @@
 /*
  * =====================================================================================
  *
- *       Filename:  GoAbandonRightAction.cpp
+ *       Filename:  GoPassCurrentColorAction.cpp
  *
  *    Description:  
  *
  *        Version:  1.0
- *        Created:  2012年11月12日 15时36分25秒
+ *        Created:  2012年11月21日 17时22分01秒
  *       Revision:  none
  *       Compiler:  gcc
  *
@@ -15,9 +15,9 @@
  *
  * =====================================================================================
  */
-#include "GoAbandonRightAction.h"
 #include "GoBoard.h"
+#include "GoPassCurrentColorAction.h"
 
-void GoAbandonRightAction::doAction(GoBoard* board) {
-  board->passToRivalColor(m_color) ;
+void GoPassCurrentColorAction::doAction(GoBoard* board) {
+  board->passHandToColor(m_color) ;
 }
